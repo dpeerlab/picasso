@@ -30,10 +30,10 @@ autodoc_mock_imports = [
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'PICASSO'
-copyright = '2025, PICASSO Team'
-author = 'PICASSO Team'
-release = '1.0.0'
-version = '1.0.0'
+copyright = '2025, dpeerlab'
+author = 'dpeerlab'
+release = '0.1.2'
+version = '0.1.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
