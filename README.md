@@ -23,8 +23,11 @@ pip install picasso_phylo
 ```
 
 ### Conda
+The package is not (yet) available on conda-forge due to some dependency issues. To use it in a conda or mamba environment, please install via pip inside your environment:
 ```bash
-conda install -c conda-forge picasso_phylo
+conda create -n picasso_env python=3.10
+conda activate picasso_env
+pip install picasso-phylo
 ```
 
 ### Development Installation

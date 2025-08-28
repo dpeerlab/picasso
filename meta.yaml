@@ -1,5 +1,5 @@
-{% set name = "picasso_phylo" %}
-{% set version = "0.1.0" %}
+{% set name = "picasso-phylo" %}
+{% set version = "0.1.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,8 +7,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: # This will be filled automatically when uploading to conda-forge
-
+  sha256: 7a20005f4ad7a0ebdc1ee1b2f74ebf0412db0fb098d5150ad22140ee08267e82
 build:
   noarch: python
   number: 0

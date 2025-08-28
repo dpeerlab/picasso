@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "picasso_phylo"
-version = "0.1.1"
+version = "0.1.2"
 description = "Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data Optimization"
 authors = [
     {name = "Sitara Persad", email = "sitara.persad@columbia.edu"}
