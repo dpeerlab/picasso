@@ -1,0 +1,25 @@
+# Include the README and LICENSE files
+include README.md
+include LICENSE
+
+# Include sample data
+recursive-include picasso/sample_data *.txt
+
+# Include type information
+include picasso/py.typed
+
+# Include test data if needed
+recursive-include tests *.py
+recursive-include tests *.txt
+recursive-include tests *.csv
+
+# Include notebooks for documentation
+recursive-include notebooks *.ipynb
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *~
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude __pycache__

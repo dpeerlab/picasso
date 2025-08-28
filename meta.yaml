@@ -1,0 +1,63 @@
+{% set name = "picasso_phylo" %}
+{% set version = "0.1.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: # This will be filled automatically when uploading to conda-forge
+
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  host:
+    - python >=3.10
+    - pip
+    - setuptools >=61.0
+    - wheel
+  run:
+    - python >=3.10
+    - numpy >=1.24.0
+    - pandas >=2.0.0
+    - pomegranate >=1.0.4
+    - ete3 >=3.1.3
+    - matplotlib-base >=3.6.0
+    - seaborn >=0.12.0
+    - tqdm >=4.64.0
+    - scipy >=1.10.0
+
+test:
+  imports:
+    - picasso
+    - picasso.build_tree
+    - picasso.CloneTree
+    - picasso.utils
+    - picasso.itol_utils
+  commands:
+    - python -c "import picasso; print(picasso.__version__)"
+  requires:
+    - pytest
+
+about:
+  home: https://github.com/sitarapersad/picasso_phylo
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data Optimization
+  description: |
+    PICASSO is a computational method for reconstructing tumor phylogenies from noisy, 
+    inferred copy number alteration (CNA) data derived from single-cell RNA sequencing 
+    (scRNA-seq). Unlike methods designed for direct scDNA-seq data, PICASSO specifically 
+    handles the uncertainty and noise inherent in CNA profiles inferred from gene 
+    expression data.
+  doc_url: https://picasso-phylo.readthedocs.io/
+  dev_url: https://github.com/sitarapersad/picasso_phylo
+
+extra:
+  recipe-maintainers:
+    - sitarapersad

@@ -1,0 +1,25 @@
+# Include base requirements
+-r requirements.txt
+
+# Development dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+isort>=5.0.0
+flake8>=5.0.0
+mypy>=1.0.0
+pre-commit>=2.0.0
+
+# Documentation
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.0.0
+sphinx-autodoc-typehints>=1.0.0
+numpydoc>=1.5.0
+
+# Jupyter notebooks
+jupyter>=1.0.0
+ipykernel>=6.0.0
+notebook>=6.0.0
+
+# Optional visualization
+pyqt5>=5.15.0

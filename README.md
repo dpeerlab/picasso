@@ -1,40 +1,82 @@
-# Picasso
+# PICASSO: Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data Optimization
 
-Picasso is a Python package for constructing phylogenetic trees from large-scale copy number alteration (CNA) data derived from single-cell sequencing. It implements an algorithm for inferring evolutionary relationships between cellular populations based on their CNA profiles.
+[![PyPI version](https://badge.fury.io/py/picasso-phylo.svg)](https://badge.fury.io/py/picasso-phylo)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/picasso_phylo.svg)](https://anaconda.org/conda-forge/picasso_phylo)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+PICASSO is a computational method for reconstructing tumor phylogenies from noisy, inferred copy number alteration (CNA) data derived from single-cell RNA sequencing (scRNA-seq). Unlike methods designed for direct scDNA-seq data, PICASSO specifically handles the uncertainty and noise inherent in CNA profiles inferred from gene expression data.
+
+## Key Features
+
+- **Noise-aware phylogenetic inference**: Uses probabilistic models to handle uncertainty in scRNA-seq-inferred CNAs
+- **Confidence-based termination**: Prevents over-fitting to noise through assignment confidence thresholds  
+- **Comprehensive visualization**: Integrated plotting and iTOL export capabilities
+- **Scalable implementation**: Handles datasets with hundreds to thousands of cells
+- **Well-documented**: Extensive documentation with focus on noisy data handling
 
 ## Installation
 
-You can install Picasso using pip:
+### PyPI (recommended)
 ```bash
-pip install git+https://github.com/dpeerlab/picasso.git
+pip install picasso_phylo
+```
+
+### Conda
+```bash
+conda install -c conda-forge picasso_phylo
+```
+
+### Development Installation
+```bash
+git clone https://github.com/dpeerlab/picasso
+cd picasso
+pip install -e ".[dev]"
 ```
 
 ## Requirements
 
-- Python 3.6+
-- NumPy
-- Pandas
-- Seaborn
-- Matplotlib
+- **Python**: ≥ 3.10
+- **Core dependencies**: numpy, pandas, pomegranate, ete3, matplotlib, seaborn, tqdm, scipy
+- **Optional**: jupyter (notebooks), pyqt5 (advanced visualization)
 
 ## Quick Start
 
 ```python
-import picasso
+from picasso import Picasso, CloneTree, load_data
 
-# Load your CNA data
-character_matrix = picasso.load_data()
+# Load example CNA data
+cna_data = load_data()
 
-# Create and fit the model
-model = Picasso(character_matrix,
-                min_depth=2,
-                min_clone_size=5,
-                assignment_confidence_threshold=0.8)
-model.fit()
+# Initialize PICASSO with noise-appropriate parameters
+picasso = Picasso(cna_data,
+                 min_clone_size=10,  # Larger for noisy data
+                 assignment_confidence_threshold=0.8,
+                 terminate_by='probability')
 
-# Get the phylogeny and clone assignments
-phylogeny = model.get_phylogeny()
-clone_assignments = model.get_clone_assignments()
+# Reconstruct phylogeny
+picasso.fit()
+
+# Extract results
+phylogeny = picasso.get_phylogeny()
+assignments = picasso.get_clone_assignments()
+
+# Create integrated analysis object
+clone_tree = CloneTree(phylogeny, assignments, cna_data)
+clone_tree.plot_alterations(save_as='cna_heatmap.pdf')
+```
+
+### For Very Noisy scRNA-seq Data
+
+```python
+# Use stricter parameters for very noisy data
+picasso_strict = Picasso(cna_data,
+                        min_clone_size=50,
+                        max_depth=8,  # Limit depth
+                        assignment_confidence_threshold=0.9,
+                        assignment_confidence_proportion=0.95,
+                        bic_penalty_strength=1.5)
+picasso_strict.fit()
 ```
 
 ## Features
@@ -109,6 +151,7 @@ stackedbar_annot = picasso.itol.dataframe_to_itol_stackedbar(
 - `terminate_by`: Criterion for terminating tree growth
 - `assignment_confidence_threshold`: Confidence threshold for sample assignment
 - `assignment_confidence_proportion`: Required proportion of samples meeting confidence threshold
+- `bic_penalty_strength`: Strength of BIC penalty term. Higher values (>1.0) encourage simpler models, useful for noisy data to prevent over-fitting.
 
 ## Visualization
 
