@@ -7,6 +7,8 @@
 
 PICASSO is a computational method for reconstructing tumor phylogenies from noisy, inferred copy number alteration (CNA) data derived from single-cell RNA sequencing (scRNA-seq). Unlike methods designed for direct scDNA-seq data, PICASSO specifically handles the uncertainty and noise inherent in CNA profiles inferred from gene expression data.
 
+For detailed documentation, please visit our readthedocs page at https://picasso-phylo.readthedocs.io/en/latest/.
+
 ## Key Features
 
 - **Noise-aware phylogenetic inference**: Uses probabilistic models to handle uncertainty in scRNA-seq-inferred CNAs
