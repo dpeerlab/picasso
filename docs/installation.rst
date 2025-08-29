@@ -12,11 +12,13 @@ The easiest way to install PICASSO is via pip from PyPI:
 
    pip install picasso-phylo
 
-For conda users:
+The package is not (yet) available on conda-forge due to some dependency issues. To use it in a conda or mamba environment, please install via pip inside your environment:
 
 .. code-block:: bash
 
-   conda install -c conda-forge picasso-phylo
+   conda create -n picasso_env python=3.10
+   conda activate picasso_env
+   pip install picasso-phylo
 
 System Requirements
 -------------------
@@ -69,7 +71,7 @@ If you want to contribute to PICASSO or need the latest development features:
 .. code-block:: bash
 
    # Clone the repository
-   git clone https://github.com/yourusername/picasso.git
+   git clone https://github.com/dpeerlab/picasso.git
    cd picasso
 
    # Install in development mode
@@ -81,26 +83,7 @@ If you want to contribute to PICASSO or need the latest development features:
 Virtual Environment Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We recommend using a virtual environment to avoid dependency conflicts:
-
-.. code-block:: bash
-
-   # Create virtual environment
-   python -m venv picasso-env
-   
-   # Activate environment (Linux/macOS)
-   source picasso-env/bin/activate
-   
-   # Activate environment (Windows)
-   picasso-env\\Scripts\\activate
-   
-   # Install PICASSO
-   pip install picasso-phylo
-
-Conda Environment Installation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For conda users who prefer isolated environments:
+We recommend using a virtual environment (conda/mamba or venv) to avoid dependency conflicts.
 
 .. code-block:: bash
 
@@ -108,10 +91,7 @@ For conda users who prefer isolated environments:
    conda create -n picasso-env python=3.11
    conda activate picasso-env
    
-   # Install PICASSO
-   conda install -c conda-forge picasso-phylo
-   
-   # Or use pip within conda environment
+   # Use pip within conda environment
    pip install picasso-phylo
 
 
