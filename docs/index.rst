@@ -22,22 +22,22 @@ PICASSO: Phylogenetic Inference of Copy number Alterations in Single-cell Sequen
 Key Features
 ------------
 
-🧬 **Noise-Aware Phylogeny Reconstruction**
+**Noise-Aware Phylogeny Reconstruction**
    - Handles uncertainty in scRNA-seq-inferred CNA data
    - Probabilistic assignment with confidence thresholds
    - Robust to technical artifacts and dropout events
 
-🌳 **Flexible Tree Building**
+**Flexible Tree Building**
    - Iterative binary splitting with categorical mixture models
    - Multiple termination criteria (BIC, confidence-based, chi-squared)
    - Customizable depth and clone size constraints
 
-📊 **Comprehensive Analysis**
+**Comprehensive Analysis**
    - Clone aggregation and modal profile generation
    - Evolutionary change inference along tree branches
    - Integration with iTOL for publication-ready visualizations
 
-🔬 **Designed for Single-Cell Data**
+**Designed for Single-Cell Data**
    - Optimized for the specific challenges of scRNA-seq CNA inference
    - Handles variable clone sizes and imbalanced datasets
    - Prevents over-fitting to noise patterns
