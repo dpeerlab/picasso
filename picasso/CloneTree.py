@@ -105,6 +105,12 @@ class CloneTree:
             Aggregated CNA profiles for each clone (rows=clones, columns=genomic features).
         clone_profiles_certainty : pd.DataFrame
             Confidence/certainty scores for each aggregated profile value.
+        clone_assignments : pd.DataFrame
+            DataFrame with cell/sample identifiers as index and clone assignments.
+        character_matrix : pd.DataFrame
+            The CNA character matrix with cells as rows and genomic features as columns.
+        metadata : Optional[pd.DataFrame]
+            Additional sample metadata for visualization and analysis.
 
         Raises
         ------

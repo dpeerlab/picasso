@@ -129,15 +129,14 @@ class Picasso:
 
         Attributes
         ----------
-        character_matrix : pd.DataFrame
-            The input character matrix after integer conversion and validation.
-        clones : dict
-            Dictionary mapping clone IDs to lists of cell indices belonging to each clone.
-            Updated iteratively during tree construction.
-        terminal_clones : dict
-            Dictionary of clones that have been marked as terminal (no further splitting).
+        terminal_clones : Dict[str, pd.Index]
+            Dictionary tracking clones marked as terminal (no further splitting).
+            Keys are clone identifiers, values are pandas Index objects of cell identifiers.
+        clones : Dict[str, pd.Index]  
+            Dictionary mapping current clone IDs to pandas Index objects of
+            cell identifiers belonging to each clone. Updated during tree construction.
         depth : int
-            Current depth of the phylogenetic tree construction.
+            Current depth of phylogenetic tree construction.
 
         Raises
         ------
