@@ -127,7 +127,7 @@ If you use PICASSO in your research, please cite our preprint while our manuscri
    url={https://www.biorxiv.org/content/10.1101/2025.02.28.640922v1},
    note={Preprint}
    }
-   
+
 Documentation Contents
 ----------------------
 
@@ -155,14 +155,14 @@ Support
 -------
 
 - **Documentation**: https://picasso-phylo.readthedocs.io/
-- **Source Code**: https://github.com/yourusername/picasso
-- **Issue Tracker**: https://github.com/yourusername/picasso/issues
+- **Source Code**: https://github.com/dpeerlab/picasso
+- **Issue Tracker**: https://github.com/dpeerlab/picasso/issues
 - **PyPI Package**: https://pypi.org/project/picasso-phylo/
 
 License
 -------
 
-PICASSO is released under the MIT License. See the `LICENSE <https://github.com/yourusername/picasso/blob/main/LICENSE>`_ file for details.
+PICASSO is released under the MIT License. See the `LICENSE <https://github.com/dpeerlab/picasso/blob/main/LICENSE>`_ file for details.
 
 Indices and tables
 ==================
