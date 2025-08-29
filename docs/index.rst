@@ -54,12 +54,6 @@ Install PICASSO from PyPI:
 
    pip install picasso-phylo
 
-Or from conda-forge:
-
-.. code-block:: bash
-
-   conda install -c conda-forge picasso-phylo
-
 Basic Usage
 ~~~~~~~~~~~
 
