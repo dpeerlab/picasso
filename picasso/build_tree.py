@@ -132,7 +132,7 @@ class Picasso:
         terminal_clones : Dict[str, pd.Index]
             Dictionary tracking clones marked as terminal (no further splitting).
             Keys are clone identifiers, values are pandas Index objects of cell identifiers.
-        clones : Dict[str, pd.Index]  
+        clones : Dict[str, pd.Index]
             Dictionary mapping current clone IDs to pandas Index objects of
             cell identifiers belonging to each clone. Updated during tree construction.
         depth : int

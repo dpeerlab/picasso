@@ -112,18 +112,22 @@ The algorithm is specifically designed to handle:
 Citation
 --------
 
-If you use PICASSO in your research, please cite:
+If you use PICASSO in your research, please cite our preprint while our manuscript is under review:
 
 .. code-block:: bibtex
 
    @article{picasso2025,
-     title={PICASSO: Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data Optimization},
-     author={Your Name and Collaborators},
-     journal={Journal Name},
-     year={2025},
-     doi={10.xxxx/xxxx}
+   title={Transcriptomic plasticity is a hallmark of metastatic pancreatic cancer},
+   author={Jim{'e}nez-S{'a}nchez, Alejandro and Persad, Sitara and Hayashi, Akimasa and Umeda, Shigeaki and Sharma, Roshan and Xie, Yubin and Mehta, Arnav and Park, Wungki and Masilionis, Ignas and Chu, Tinyi and Zhu, Feiyang and Hong, Jungeui and Chaligne, Ronan and O'Reilly, Eileen M. and Mazutis, Linas and Nawy, Tal and Pe'er, Itsik and Iacobuzio-Donahue, Christine A. and Pe'er, Dana},
+   journal={bioRxiv},
+   year={2025},
+   month={February},
+   day={28},
+   doi={10.1101/2025.02.28.640922},
+   url={https://www.biorxiv.org/content/10.1101/2025.02.28.640922v1},
+   note={Preprint}
    }
-
+   
 Documentation Contents
 ----------------------
 
