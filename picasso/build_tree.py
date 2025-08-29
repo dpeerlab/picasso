@@ -2,8 +2,8 @@
 PICASSO: Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data Optimization.
 
 This module implements the core PICASSO algorithm for reconstructing tumor phylogenies
-from noisy, inferred copy number alteration (CNA) data derived from single-cell RNA 
-sequencing. The algorithm uses iterative binary splitting with categorical mixture 
+from noisy, inferred copy number alteration (CNA) data derived from single-cell RNA
+sequencing. The algorithm uses iterative binary splitting with categorical mixture
 models to handle uncertainty and noise typical in scRNA-seq-inferred CNAs.
 
 Classes
@@ -17,15 +17,15 @@ Examples
 Basic phylogenetic reconstruction:
 
 >>> from picasso import Picasso, load_data
->>> 
+>>>
 >>> # Load example CNA data
 >>> cna_data = load_data()
->>> 
+>>>
 >>> # Initialize with parameters suitable for noisy data
->>> picasso = Picasso(cna_data, 
+>>> picasso = Picasso(cna_data,
 ...                  min_clone_size=10,  # Larger for noisy data
 ...                  assignment_confidence_threshold=0.8)
->>> 
+>>>
 >>> # Reconstruct phylogeny
 >>> picasso.fit()
 >>> phylogeny = picasso.get_phylogeny()
@@ -67,34 +67,29 @@ if not log.hasHandlers():
     log.addHandler(logging.StreamHandler())
 log.propagate = False
 
+
 class Picasso:
-    assignment_confidence_threshold: float
-    assignment_confidence_proportion: float
-    bic_penalty_strength: float
-    character_matrix: pd.DataFrame
-    min_depth: int
-    max_depth: Union[int, float]
-    min_clone_size: int
-    terminate_by: str
     terminal_clones: Dict[str, pd.Index]
     clones: Dict[str, pd.Index]
     depth: int
 
-    def __init__(self,
-                 character_matrix: pd.DataFrame,
-                 min_depth: Optional[int] = None,
-                 max_depth: Optional[int] = None,
-                 min_clone_size: int = 5,
-                 terminate_by: str = 'probability',
-                 assignment_confidence_threshold: float = 0.75,
-                 assignment_confidence_proportion: float = 0.8,
-                 bic_penalty_strength: float = 1.0) -> None:
+    def __init__(
+        self,
+        character_matrix: pd.DataFrame,
+        min_depth: Optional[int] = None,
+        max_depth: Optional[int] = None,
+        min_clone_size: int = 5,
+        terminate_by: str = "probability",
+        assignment_confidence_threshold: float = 0.75,
+        assignment_confidence_proportion: float = 0.8,
+        bic_penalty_strength: float = 1.0,
+    ) -> None:
         """
         Initialize the PICASSO model for phylogenetic inference from noisy CNA data.
-        
-        PICASSO (Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data 
-        Optimization) reconstructs tumor phylogenies from inferred copy number alterations (CNAs) 
-        derived from single-cell RNA sequencing data. Unlike direct scDNA-seq data, scRNA-seq-inferred 
+
+        PICASSO (Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data
+        Optimization) reconstructs tumor phylogenies from inferred copy number alterations (CNAs)
+        derived from single-cell RNA sequencing data. Unlike direct scDNA-seq data, scRNA-seq-inferred
         CNAs are noisy and require specialized handling for more accurate phylogenetic reconstruction.
 
         Parameters
@@ -102,14 +97,14 @@ class Picasso:
         character_matrix : pd.DataFrame
             An integer matrix where rows are single cells/samples and columns are genomic features
             (e.g., chromosome arms, genes, or genomic bins). Values represent inferred copy number
-            states (e.g., 0=deletion, 1=neutral, 2=amplification). For noisy scRNA-seq-inferred 
+            states (e.g., 0=deletion, 1=neutral, 2=amplification). For noisy scRNA-seq-inferred
             data, values may include noise artifacts that PICASSO handles through probabilistic
             modeling.
         min_depth : int, optional
             The minimum depth (number of splitting iterations) of the phylogeny. Forces algorithm
             to continue splitting even if termination criteria are met, useful for exploring
             deeper clonal structure in noisy data. Default is None (no minimum enforced).
-        max_depth : int, optional  
+        max_depth : int, optional
             The maximum depth of the phylogeny to prevent over-fitting in noisy data.
             Default is None (unlimited depth).
         min_clone_size : int, default=5
@@ -124,7 +119,7 @@ class Picasso:
             Minimum confidence threshold for clone assignments when terminate_by='probability'.
             Higher values (0.8-0.9) recommended for very noisy scRNA-seq data to ensure
             confident assignments. Must be between 0 and 1.
-        assignment_confidence_proportion : float, default=0.8  
+        assignment_confidence_proportion : float, default=0.8
             Minimum proportion of cells with confident assignments required for clone splitting
             when terminate_by='probability'. Higher values help avoid splitting based on
             uncertain assignments in noisy data. Must be between 0 and 1.
@@ -157,27 +152,27 @@ class Picasso:
         Examples
         --------
         Basic usage with scRNA-seq-inferred CNA data:
-        
+
         >>> from picasso import Picasso, load_data
-        >>> 
+        >>>
         >>> # Load example CNA data
         >>> character_matrix = load_data()
-        >>> 
+        >>>
         >>> # Initialize PICASSO with parameters suitable for noisy data
-        >>> picasso = Picasso(character_matrix, 
+        >>> picasso = Picasso(character_matrix,
         ...                  min_clone_size=10,  # Choose a larger value for very noisy data
         ...                  assignment_confidence_threshold=0.85,  # Higher confidence
         ...                  assignment_confidence_proportion=0.9)
-        >>> 
+        >>>
         >>> # Fit the model
         >>> picasso.fit()
-        >>> 
+        >>>
         >>> # Get results
         >>> phylogeny = picasso.get_phylogeny()
         >>> clone_assignments = picasso.get_clone_assignments()
 
         For very noisy data, use stricter parameters:
-        
+
         >>> # Parameters for very noisy scRNA-seq-inferred CNAs
         >>> picasso_strict = Picasso(character_matrix,
         ...                         min_clone_size=50,
@@ -192,10 +187,10 @@ class Picasso:
         ...                         terminate_by='BIC')
         >>> picasso_strict.fit()
 
-        Notes  
+        Notes
         -----
         The PICASSO algorithm proceeds through the following steps:
-        
+
         1. **Initialization**: All cells start in a single root clone
         2. **Iterative Splitting**: At each depth level:
            - For each current clone, fit Categorical Mixture Models with k=1 and k=2 components
@@ -204,13 +199,13 @@ class Picasso:
         3. **Termination**: Stop when no clones can be split further or max_depth is reached
         4. **Tree Construction**: Build phylogenetic tree from clone hierarchy. Leaves are clones containing cells
             whose CNAs cannot be further distinguised reliably.
-        
+
         **Handling Noisy scRNA-seq Data**:
         - Uses probabilistic assignment with confidence thresholds
         - Minimum clone size prevents spurious small clones from noise
         - BIC penalty prevents over-fitting to noise artifacts
         - Confidence-based termination handles assignment uncertainty
-        
+
         **Model Assumptions**:
         - CNAs are acquired progressively but can be acquired multiple times independently (no perfect phylogeny assumption)
         - Each genomic feature evolves independently
@@ -224,46 +219,65 @@ class Picasso:
         get_clone_assignments : Method to get cell-to-clone assignments
 
         """
-        assert isinstance(assignment_confidence_threshold, float), 'assignment_confidence_threshold must be a float'
-        assert isinstance(assignment_confidence_proportion, float), 'assignment_confidence_proportion must be a float'
-        assert 0 <= assignment_confidence_threshold <= 1, 'assignment_confidence_threshold must be between 0 and 1'
-        assert 0 <= assignment_confidence_proportion <= 1, 'assignment_confidence_proportion must be between 0 and 1'
+        assert isinstance(
+            assignment_confidence_threshold, float
+        ), "assignment_confidence_threshold must be a float"
+        assert isinstance(
+            assignment_confidence_proportion, float
+        ), "assignment_confidence_proportion must be a float"
+        assert (
+            0 <= assignment_confidence_threshold <= 1
+        ), "assignment_confidence_threshold must be between 0 and 1"
+        assert (
+            0 <= assignment_confidence_proportion <= 1
+        ), "assignment_confidence_proportion must be between 0 and 1"
         self.assignment_confidence_threshold = assignment_confidence_threshold
         self.assignment_confidence_proportion = assignment_confidence_proportion
         self.bic_penalty_strength = bic_penalty_strength
 
-        assert isinstance(character_matrix, pd.DataFrame), 'character_matrix must be a pandas DataFrame'
+        assert isinstance(
+            character_matrix, pd.DataFrame
+        ), "character_matrix must be a pandas DataFrame"
         # Convert character matrix to integer values
         try:
             character_matrix = character_matrix.astype(int).copy()
         except:
             raise ValueError("Character matrix must be convertible to integer values.")
 
-        assert isinstance(min_depth, int) or min_depth is None, 'min_depth must be an integer or None'
-        assert isinstance(max_depth, int) or max_depth is None, 'max_depth must be an integer or None'
-        assert isinstance(min_clone_size, int) or min_clone_size is None, 'min_clone_size must be an integer or None'
+        assert (
+            isinstance(min_depth, int) or min_depth is None
+        ), "min_depth must be an integer or None"
+        assert (
+            isinstance(max_depth, int) or max_depth is None
+        ), "max_depth must be an integer or None"
+        assert (
+            isinstance(min_clone_size, int) or min_clone_size is None
+        ), "min_clone_size must be an integer or None"
         terminate_by = terminate_by.upper()
-        assert terminate_by in ['PROBABILITY', 'BIC'], 'terminate_by must be either "probability" or "BIC"'
+        assert terminate_by in [
+            "PROBABILITY",
+            "BIC",
+        ], 'terminate_by must be either "probability" or "BIC"'
 
         self.character_matrix = character_matrix
         self.min_depth = min_depth if min_depth is not None else 0
-        self.max_depth = max_depth if max_depth is not None else float('inf')
+        self.max_depth = max_depth if max_depth is not None else float("inf")
         if min_clone_size is not None:
-            assert isinstance(min_clone_size, int), 'min_clone_size must be an integer'
-            assert min_clone_size > 0, 'min_clone_size must be greater than 0'
+            assert isinstance(min_clone_size, int), "min_clone_size must be an integer"
+            assert min_clone_size > 0, "min_clone_size must be greater than 0"
         self.min_clone_size = min_clone_size if min_clone_size is not None else 1
         self.terminate_by = terminate_by
 
         self.terminal_clones = {}
-        self.clones = {'1': character_matrix.index}
+        self.clones = {"1": character_matrix.index}
         self.depth = 0
 
     def split_clone(self, clone: str, force_split: bool = False) -> Dict[str, pd.Index]:
         """
         Attempt to split a single clone into two daughter clones using mixture modeling.
-        
+
         Evaluates whether a clone should be split by fitting Categorical Mixture Models
-        and applying termination criteria. This is the core method for handling noisy 
+        and applying termination criteria. This is the core method for handling noisy
         CNA data through probabilistic modeling and confidence-based decisions.
 
         Parameters
@@ -291,7 +305,7 @@ class Picasso:
         >>> # After some fitting steps, try splitting a specific clone
         >>> result = picasso.split_clone('1-0')
         >>> print(f"Split result: {list(result.keys())}")
-        
+
         Force splitting (ignoring confidence criteria):
         >>> forced_result = picasso.split_clone('1-1', force_split=True)
 
@@ -305,12 +319,12 @@ class Picasso:
         5. Evaluate termination criteria (BIC or confidence)
         6. Apply minimum clone size constraint
         7. Return split result or mark as terminal
-        
+
         **Termination Criteria**:
         - **BIC**: k=1 model has lower BIC than k=2 model
         - **Probability**: Insufficient assignment confidence or proportion
         - **Size constraint**: Either daughter clone below min_clone_size
-        
+
         **Noise Handling**:
         - Confidence thresholds prevent splits based on uncertain assignments
         - Minimum clone sizes avoid spurious small clusters
@@ -324,7 +338,7 @@ class Picasso:
         fit : Main method that orchestrates the complete splitting process
         """
         new_clones = {}
-        log.debug(f'\t Processing Clone {clone} of size {len(self.clones[clone])}.')
+        log.debug(f"\t Processing Clone {clone} of size {len(self.clones[clone])}.")
         if clone in self.terminal_clones:
             new_clones[clone] = self.clones[clone]
             return new_clones
@@ -332,7 +346,9 @@ class Picasso:
         # Get the samples corresponding to this leaf node
         samples = self.clones[clone]
         # Get the character matrix for these samples, keeping only features with variance greater than 1e-10
-        character_matrix = self.character_matrix.loc[samples, self.character_matrix.var() > 1e-10].copy()
+        character_matrix = self.character_matrix.loc[
+            samples, self.character_matrix.var() > 1e-10
+        ].copy()
 
         # Ensure that the character matrix is not empty
         if len(character_matrix.columns) == 0:
@@ -350,56 +366,66 @@ class Picasso:
         assignments = np.argmax(responsibilities, axis=1)
 
         terminate = False
-        if self.terminate_by == 'BIC':
+        if self.terminate_by == "BIC":
             model1, bic1 = self._select_model(X, 1)
             if bic1 < bic2:
                 terminate = True
 
-        if self.terminate_by == 'PROBABILITY':
+        if self.terminate_by == "PROBABILITY":
             # Determine confident assignments
-            confident_assignments = np.max(responsibilities, axis=1) >= self.assignment_confidence_threshold
-            confident_proportion = np.sum(confident_assignments) / character_matrix.shape[0]
+            confident_assignments = (
+                np.max(responsibilities, axis=1) >= self.assignment_confidence_threshold
+            )
+            confident_proportion = (
+                np.sum(confident_assignments) / character_matrix.shape[0]
+            )
             if confident_proportion < self.assignment_confidence_proportion:
                 terminate = True
 
-        if self.terminate_by == 'CHI_SQUARED':
-            terminate = not self._perform_chi_squared(X, responsibilities, self.chi_squared_p_value)
+        if self.terminate_by == "CHI_SQUARED":
+            terminate = not self._perform_chi_squared(
+                X, responsibilities, self.chi_squared_p_value
+            )
 
         try:
             samples_in_clone_0 = samples[assignments == 0]
             samples_in_clone_1 = samples[assignments == 1]
         except Exception as e:
             print(set(assignments))
-            print(assignments==0)
+            print(assignments == 0)
             raise e
 
         # If the algorithm is forced to split, try to split the clone regardless of the BIC score
         if force_split and terminate:
-            log.debug(f'\t -Forced split of clone {clone}.')
+            log.debug(f"\t -Forced split of clone {clone}.")
             terminate = False
 
         # No matter what, if a clone is too small, terminate it
-        if len(samples_in_clone_0) < self.min_clone_size or len(samples_in_clone_1) < self.min_clone_size:
+        if (
+            len(samples_in_clone_0) < self.min_clone_size
+            or len(samples_in_clone_1) < self.min_clone_size
+        ):
             terminate = True
 
         if terminate:
-            self.terminal_clones[f'{clone}-STOP'] = samples
-            new_clones[f'{clone}-STOP'] = samples
-            log.debug(f'\t -Terminated clone {clone}.')
+            self.terminal_clones[f"{clone}-STOP"] = samples
+            new_clones[f"{clone}-STOP"] = samples
+            log.debug(f"\t -Terminated clone {clone}.")
 
         else:
-            new_clones[f'{clone}-0'] = samples_in_clone_0
-            new_clones[f'{clone}-1'] = samples_in_clone_1
+            new_clones[f"{clone}-0"] = samples_in_clone_0
+            new_clones[f"{clone}-1"] = samples_in_clone_1
             log.debug(
                 f'\t -Split clone {clone} into sublones of sizes {len(new_clones[f"{clone}-0"])}'
-                f' and {len(new_clones[f"{clone}-1"])}')
-        log.debug('\t -------------------')
+                f' and {len(new_clones[f"{clone}-1"])}'
+            )
+        log.debug("\t -------------------")
         return new_clones
 
     def step(self, force_split: bool = False) -> None:
         """
         Execute one complete iteration of clone splitting across all current leaf clones.
-        
+
         Applies the split_clone method to all current leaf clones in parallel, representing
         one depth level of the phylogenetic reconstruction process. This method coordinates
         the simultaneous evaluation of all clones at the current tree depth.
@@ -419,17 +445,17 @@ class Picasso:
         3. Collect all resulting clones (split or terminal)
         4. Update self.clones with the new clone structure
         5. Terminal clones are tracked in self.terminal_clones
-        
+
         **Progress Tracking**:
         - Uses tqdm progress bar to show splitting progress
         - Logs clone processing information at debug level
         - Reports clone sizes and splitting decisions
-        
+
         **State Modification**:
         - Updates self.clones with new clone structure
         - Adds terminal clones to self.terminal_clones
         - Preserves cell-to-clone assignment mappings
-        
+
         **Parallelization Note**:
         Currently processes clones sequentially. Future versions may implement
         parallel processing for large datasets.
@@ -442,7 +468,7 @@ class Picasso:
         >>> print(f"Initial clones: {len(picasso.clones)}")
         >>> picasso.step()  # Perform one splitting iteration
         >>> print(f"After step: {len(picasso.clones)} clones, {len(picasso.terminal_clones)} terminal")
-        
+
         Force splitting to explore deeper structure:
         >>> picasso.step(force_split=True)
 
@@ -462,10 +488,10 @@ class Picasso:
     def fit(self) -> None:
         """
         Fit the PICASSO phylogenetic model to the noisy CNA data.
-        
-        Executes the complete PICASSO algorithm by iteratively splitting clones until 
-        termination criteria are met. The algorithm is designed to handle noise and 
-        uncertainty in scRNA-seq-inferred CNA data through probabilistic modeling and 
+
+        Executes the complete PICASSO algorithm by iteratively splitting clones until
+        termination criteria are met. The algorithm is designed to handle noise and
+        uncertainty in scRNA-seq-inferred CNA data through probabilistic modeling and
         confidence-based termination.
 
         Parameters
@@ -480,22 +506,22 @@ class Picasso:
         Notes
         -----
         The fitting process proceeds as follows:
-        
-        1. **Iterative Splitting**: At each depth level, all current leaf clones are 
+
+        1. **Iterative Splitting**: At each depth level, all current leaf clones are
            evaluated for splitting using Categorical Mixture Models
-        2. **Noise Handling**: Uses confidence thresholds and minimum clone sizes to 
+        2. **Noise Handling**: Uses confidence thresholds and minimum clone sizes to
            avoid splits driven by noise artifacts
-        3. **Forced Splitting**: If min_depth is specified, forces splits until that 
+        3. **Forced Splitting**: If min_depth is specified, forces splits until that
            depth is reached (unless clone size is insufficient)
-        4. **Termination**: Stops when all clones are terminal, max_depth is reached, 
+        4. **Termination**: Stops when all clones are terminal, max_depth is reached,
            or no clones meet splitting criteria
-           
+
         **Termination Conditions**:
         - All leaf clones have been marked as terminal
-        - Maximum depth limit reached (if specified)  
+        - Maximum depth limit reached (if specified)
         - No clones have sufficient size for splitting
         - Confidence/BIC criteria not met for any clones
-        
+
         **For Noisy scRNA-seq Data**:
         - Higher confidence thresholds prevent spurious splits
         - Larger minimum clone sizes reduce noise-driven artifacts
@@ -521,25 +547,30 @@ class Picasso:
         while not algorithm_finished:
             self.depth += 1
             log.info(
-                f'Tree Depth {self.depth}: {len(self.clones)} clone(s), {len(self.terminal_clones)} terminal clone(s). '
-                f'Force Split: {self.depth <= self.min_depth}')
-            self.step(force_split=self.depth<=self.min_depth)
+                f"Tree Depth {self.depth}: {len(self.clones)} clone(s), {len(self.terminal_clones)} terminal clone(s). "
+                f"Force Split: {self.depth <= self.min_depth}"
+            )
+            self.step(force_split=self.depth <= self.min_depth)
 
             # Determine whether all leaf nodes have been terminated or if the algorithm has reached the maximum depth
             if self.depth < self.min_depth:
                 continue
             if self.depth >= self.max_depth:
-                log.info(f'Maximum depth of {self.max_depth} reached.')
+                log.info(f"Maximum depth of {self.max_depth} reached.")
                 algorithm_finished = True
             if len(set(self.clones)) == len(set(self.terminal_clones)):
-                log.info('All leaf nodes have been terminated.')
+                log.info("All leaf nodes have been terminated.")
                 algorithm_finished = True
-        log.info(f'PICASSO algorithm finished in {time.time() - start_time:.2f} seconds.')
+        log.info(
+            f"PICASSO algorithm finished in {time.time() - start_time:.2f} seconds."
+        )
 
-    def _select_model(self, X: np.ndarray, n_clusters: int) -> Tuple[GeneralMixtureModel, float]:
+    def _select_model(
+        self, X: np.ndarray, n_clusters: int
+    ) -> Tuple[GeneralMixtureModel, float]:
         """
         Select the best Categorical Mixture Model using multiple random initializations.
-        
+
         Fits multiple Categorical Mixture Models with different random initializations
         and selects the model with the best (lowest) BIC score. This approach helps
         overcome local optima that can occur when fitting mixture models to noisy
@@ -570,12 +601,12 @@ class Picasso:
         - For single components (n_clusters=1): Runs 1 trial (deterministic)
         - For multiple components: Runs up to 5 trials with different initializations
         - Selects model with lowest BIC score across all successful trials
-        
+
         **Error Handling**:
         - If standard random initialization fails, tries controlled initialization
         - Uses _initialize_clusters() method for robust fallback initialization
         - Logs trial information and BIC scores for debugging
-        
+
         **BIC Score Calculation**:
         - Uses custom _get_BIC_score() method with configurable penalty strength
         - Accounts for model complexity and data likelihood
@@ -609,35 +640,41 @@ class Picasso:
                     distributions = [Categorical() for _ in range(n_clusters)]
                 model = GeneralMixtureModel(distributions, verbose=False).fit(X)
                 bic_score = self._get_BIC_score(model, X, self.bic_penalty_strength)
-                assert not np.isinf(bic_score), f'BIC score is {bic_score}.'
+                assert not np.isinf(bic_score), f"BIC score is {bic_score}."
                 if n_clusters > 1:
-                    log.debug(f'\t -Trial {n_trials + 1}: BIC = {bic_score}')
+                    log.debug(f"\t -Trial {n_trials + 1}: BIC = {bic_score}")
                 # Select the lowest BIC score
                 if bic_score < best_bic:
                     best_bic = bic_score
                     best_model = model
                 n_trials += 1
             except Exception as e:
-                log.debug(f'\t -Trial {n_trials + 1}: {e}. Retrying with controlled initialization.')
+                log.debug(
+                    f"\t -Trial {n_trials + 1}: {e}. Retrying with controlled initialization."
+                )
                 distributions = self._initialize_clusters(X, n_clusters)
                 model = GeneralMixtureModel(distributions, verbose=False).fit(X)
                 bic_score = self._get_BIC_score(model, X)
-                assert not np.isinf(bic_score), f'BIC score is {bic_score}.'
+                assert not np.isinf(bic_score), f"BIC score is {bic_score}."
                 if n_clusters > 1:
-                    log.debug(f'\t -Trial {n_trials + 1}: BIC = {bic_score}')
+                    log.debug(f"\t -Trial {n_trials + 1}: BIC = {bic_score}")
                 # Select the lowest BIC score
                 if bic_score < best_bic:
                     best_bic = bic_score
                     best_model = model
                 n_trials += 1
-        assert not np.isnan(best_bic) and not np.isinf(best_bic), f'Best BIC score is {best_bic}.'
+        assert not np.isnan(best_bic) and not np.isinf(
+            best_bic
+        ), f"Best BIC score is {best_bic}."
         return best_model, best_bic
 
     @staticmethod
-    def _get_BIC_score(model: GeneralMixtureModel, X: np.ndarray, bic_penalty_strength: float = 1.0) -> float:
+    def _get_BIC_score(
+        model: GeneralMixtureModel, X: np.ndarray, bic_penalty_strength: float = 1.0
+    ) -> float:
         """
         Calculate Bayesian Information Criterion (BIC) score for mixture model selection.
-        
+
         Computes the BIC score to balance model fit quality against complexity. Lower BIC
         scores indicate better models. The BIC penalizes complex models to prevent over-fitting
         to noise in scRNA-seq-inferred CNA data.
@@ -665,17 +702,17 @@ class Picasso:
         - Log-likelihood: Measures how well the model fits the data
         - Complexity penalty: Number of model parameters × log(sample size)
         - Penalty strength: Allows adjustment of complexity penalty weight
-        
+
         **Parameter Counting**:
         - For each cluster: (n_states - 1) × n_features parameters
         - Plus (n_clusters - 1) mixture weight parameters
         - Total complexity scales with number of clusters and features
-        
+
         **Interpretation**:
         - More negative log probability → higher BIC (worse)
         - More model parameters → higher BIC (worse)
         - Optimal model minimizes BIC score
-        
+
         **Noise Handling**:
         - Higher penalty_strength values help avoid over-fitting to noise
         - Particularly important for noisy scRNA-seq-inferred CNAs
@@ -686,19 +723,25 @@ class Picasso:
         split_clone : Method that compares BIC scores to decide on splitting
         """
         D, K = model.distributions[0].probs.shape
-        params_per_cluster = (model.distributions[0].probs.shape[1] - 1) * model.distributions[0].probs.shape[0]
+        params_per_cluster = (
+            model.distributions[0].probs.shape[1] - 1
+        ) * model.distributions[0].probs.shape[0]
         n_clusters = len(model.distributions)
         n_params = params_per_cluster * n_clusters + n_clusters - 1
         logprob = model.log_probability(X).sum()
-        bic_score = -2 * logprob + bic_penalty_strength*(n_params * np.log(X.shape[0]))
+        bic_score = -2 * logprob + bic_penalty_strength * (
+            n_params * np.log(X.shape[0])
+        )
 
         return bic_score
 
     @staticmethod
-    def _perform_chi_squared(X: np.ndarray, responsibilities: np.ndarray, threshold: float = 0.05) -> bool:
+    def _perform_chi_squared(
+        X: np.ndarray, responsibilities: np.ndarray, threshold: float = 0.05
+    ) -> bool:
         """
         Perform chi-squared test to evaluate statistical significance of clone splitting.
-        
+
         Tests whether the observed differences in CNA profiles between two potential
         clones are statistically significant using a chi-squared test of independence.
         This provides an alternative to BIC-based splitting criteria.
@@ -728,17 +771,17 @@ class Picasso:
         - Constructs contingency tables of copy number states × clones
         - Uses weighted counts based on soft assignment probabilities
         - Performs chi-squared test of independence
-        
+
         **Interpretation**:
         - Low p-value (< threshold): Significant difference between clones → split
         - High p-value (≥ threshold): No significant difference → don't split
-        
+
         **Implementation Details**:
         - Handles all unique copy number states in the data
         - Uses soft assignments to weight expected frequencies
         - Adds small pseudocount (1e-5) to avoid zero frequencies
         - Flattens contingency tables for chi-squared test
-        
+
         **Usage Context**:
         - Alternative to BIC-based termination criteria
         - Can be selected via terminate_by='CHI_SQUARED' parameter
@@ -750,6 +793,7 @@ class Picasso:
         scipy.stats.chi2_contingency : Underlying statistical test function
         """
         from scipy.stats import chi2_contingency, chisquare
+
         # States are assumed to be 0, 1, 2, ... (already shifted to be positive)
         states = np.unique(X)
 
@@ -765,7 +809,9 @@ class Picasso:
                 # Get the cells with the current state
                 state_cells = X == state
                 # Get the expected frequency for the current state in the current clone
-                expected_frequencies[state, :, clone] = (state_cells.T @ responsibilities[:, clone])
+                expected_frequencies[state, :, clone] = (
+                    state_cells.T @ responsibilities[:, clone]
+                )
 
         # Ensure that there are no expected frequencies of zero
         expected_frequencies[expected_frequencies == 0] = 1e-5
@@ -773,21 +819,25 @@ class Picasso:
         # For performing the Chi-squared test, flatten the tables appropriately
         contingency_table_clone1 = expected_frequencies[:, :, 0].flatten()
         contingency_table_clone2 = expected_frequencies[:, :, 1].flatten()
-        contingency_table = np.vstack([contingency_table_clone1, contingency_table_clone2])
+        contingency_table = np.vstack(
+            [contingency_table_clone1, contingency_table_clone2]
+        )
 
         # Perform Chi-squared test
         chi2, p, dof, expected = chi2_contingency(contingency_table)
 
         # Decision based on the p-value
-        log.debug('Chi-squared p-value:', p)
+        log.debug("Chi-squared p-value:", p)
         split_decision = p < threshold
         return split_decision
 
     @staticmethod
-    def _initialize_clusters(array: np.ndarray, num_partitions: int) -> List[Categorical]:
+    def _initialize_clusters(
+        array: np.ndarray, num_partitions: int
+    ) -> List[Categorical]:
         """
         Initialize Categorical distributions for mixture model with controlled partitioning.
-        
+
         Creates robust initial parameter estimates for Categorical mixture models by
         randomly partitioning cells and fitting separate distributions to each partition.
         This controlled initialization helps overcome convergence issues that can occur
@@ -819,18 +869,18 @@ class Picasso:
         - Creates random breakpoints for partitioning
         - Ensures each partition has at least one cell
         - Augments each partition with maximum values to ensure full state coverage
-        
+
         **Robustness Features**:
         - Adds row with maximum values to each partition
         - Ensures all copy number states are represented in each distribution
         - Prevents model fitting failures due to missing states
         - Creates diverse initial parameter estimates
-        
+
         **Use Case**:
         - Fallback initialization when standard random initialization fails
         - Called by _select_model() when mixture model fitting encounters errors
         - Particularly useful for noisy or sparse CNA data
-        
+
         **Algorithm Steps**:
         1. Shuffle cell indices randomly
         2. Choose random breakpoints for partitioning
@@ -852,7 +902,9 @@ class Picasso:
         shuffled_indices = np.random.permutation(num_elements)
 
         # Choose random break points
-        break_points = sorted(np.random.choice(num_elements - 1, num_partitions - 1, replace=False) + 1)
+        break_points = sorted(
+            np.random.choice(num_elements - 1, num_partitions - 1, replace=False) + 1
+        )
 
         # Split the indices at the break points
         partitions = np.split(shuffled_indices, break_points)
@@ -872,16 +924,16 @@ class Picasso:
     def get_phylogeny(self) -> ete3.Tree:
         """
         Extract the reconstructed phylogenetic tree from the fitted PICASSO model.
-        
-        Converts the hierarchical clone structure into an ete3.Tree object for 
-        visualization and downstream analysis. The tree represents the inferred 
+
+        Converts the hierarchical clone structure into an ete3.Tree object for
+        visualization and downstream analysis. The tree represents the inferred
         evolutionary relationships between clones based on their CNA profiles.
 
         Returns
         -------
         ete3.Tree
-            Phylogenetic tree where leaves represent terminal clones and internal 
-            nodes represent ancestral clones. Node names correspond to clone IDs 
+            Phylogenetic tree where leaves represent terminal clones and internal
+            nodes represent ancestral clones. Node names correspond to clone IDs
             from the splitting process (e.g., '1', '1-0', '1-1', '1-0-STOP').
 
         Examples
@@ -893,7 +945,7 @@ class Picasso:
         >>> tree = picasso.get_phylogeny()
         >>> print(tree.get_ascii())  # Display tree structure
         >>> print(f"Tree has {len(tree.get_leaves())} terminal clones")
-        
+
         Get leaf names:
         >>> leaf_names = tree.get_leaf_names()
         >>> print(f"Terminal clones: {leaf_names}")
@@ -912,20 +964,20 @@ class Picasso:
         CloneTree : Class for enhanced tree visualization and analysis
         create_tree_from_paths : Static method for tree construction from paths
         """
-        phylogeny = self.create_tree_from_paths(self.clones.keys(), '-')
+        phylogeny = self.create_tree_from_paths(self.clones.keys(), "-")
         return phylogeny
 
     def get_clone_assignments(self) -> pd.DataFrame:
         """
         Extract cell-to-clone assignments from the fitted PICASSO model.
-        
+
         Returns a DataFrame mapping each cell/sample to its assigned terminal clone.
         These assignments represent the final clustering result after the phylogenetic
         reconstruction process.
 
         Returns
         -------
-        pd.DataFrame  
+        pd.DataFrame
             DataFrame with cell/sample identifiers as index and a 'clone_id' column
             containing the assigned clone ID for each cell. Clone IDs correspond to
             the terminal nodes in the phylogenetic tree.
@@ -939,11 +991,11 @@ class Picasso:
         >>> assignments = picasso.get_clone_assignments()
         >>> print(assignments.head())
         >>> print(f"Number of clones: {assignments['clone_id'].nunique()}")
-        
+
         Get cells in a specific clone:
         >>> clone_cells = assignments[assignments['clone_id'] == '1-0-STOP'].index
         >>> print(f"Cells in clone 1-0-STOP: {list(clone_cells)}")
-        
+
         Clone size distribution:
         >>> clone_sizes = assignments['clone_id'].value_counts()
         >>> print("Clone sizes:")
@@ -963,18 +1015,18 @@ class Picasso:
         CloneTree : Class for integrated analysis of assignments and phylogeny
         fit : Method that performs the clustering and phylogeny reconstruction
         """
-        clone_assigments = {'samples':[], 'clone_id':[]}
+        clone_assigments = {"samples": [], "clone_id": []}
         for clone in self.clones:
-            clone_assigments['samples'].extend(self.clones[clone])
-            clone_assigments['clone_id'].extend([clone] * len(self.clones[clone]))
-        clone_assigments = pd.DataFrame(clone_assigments).set_index('samples')
+            clone_assigments["samples"].extend(self.clones[clone])
+            clone_assigments["clone_id"].extend([clone] * len(self.clones[clone]))
+        clone_assigments = pd.DataFrame(clone_assigments).set_index("samples")
         return clone_assigments
 
     @staticmethod
-    def create_tree_from_paths(paths: List[str], separator: str = ':') -> ete3.TreeNode:
+    def create_tree_from_paths(paths: List[str], separator: str = ":") -> ete3.TreeNode:
         """
         Construct phylogenetic tree from hierarchical clone path identifiers.
-        
+
         Converts a list of clone path strings into an ete3 tree structure by parsing
         the hierarchical splitting history encoded in each path. This is used internally
         by PICASSO to generate the final phylogenetic tree from the clone splitting process.
@@ -1000,9 +1052,9 @@ class Picasso:
         Examples
         --------
         Basic tree construction from clone paths:
-        
+
         >>> from picasso.build_tree import Picasso
-        >>> 
+        >>>
         >>> # Example clone paths from PICASSO splitting
         >>> clone_paths = ['1', '1-0-STOP', '1-1-0-STOP', '1-1-1-STOP']
         >>> tree = Picasso.create_tree_from_paths(clone_paths, '-')
@@ -1015,13 +1067,13 @@ class Picasso:
         - Root level: Single character (typically '1')
         - Subsequent levels: Added via separator (e.g., '1-0', '1-1')
         - Terminal indicator: Often ends with '-STOP' for final clones
-        
+
         **Tree Construction Logic**:
         - Identifies common root from all paths
         - Builds tree level by level based on path prefixes
         - Creates parent-child relationships following path hierarchy
         - Handles variable depth paths automatically
-        
+
         **Internal Use**:
         - Called by get_phylogeny() to convert clone structure to tree
         - Maintains clone ID information in node names
@@ -1039,7 +1091,7 @@ class Picasso:
         """
         paths = list(set(paths))
         root = list(set([path[0] for path in paths]))
-        assert len(root) == 1, 'All paths must start with the same character'
+        assert len(root) == 1, "All paths must start with the same character"
         max_depth = max([len(path.split(separator)) for path in paths])
 
         all_nodes = {str(root[0]): ete3.TreeNode(name=str(root[0]))}
@@ -1060,4 +1112,4 @@ class Picasso:
 
 
 # Define public API
-__all__ = ['Picasso']
+__all__ = ["Picasso"]

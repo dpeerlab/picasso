@@ -11,7 +11,7 @@ rgba_to_hex
     Convert RGBA color tuples to hexadecimal strings for iTOL compatibility.
 dataframe_to_itol_colorstrip
     Create iTOL colorstrip annotations for categorical data (e.g., clone assignments).
-dataframe_to_itol_heatmap  
+dataframe_to_itol_heatmap
     Create iTOL heatmap annotations for continuous CNA data visualization.
 dataframe_to_itol_stackedbar
     Create iTOL stacked bar annotations for multi-category data display.
@@ -23,24 +23,24 @@ Export PICASSO results for iTOL visualization:
 >>> from picasso import Picasso, load_data
 >>> from picasso.itol_utils import dataframe_to_itol_colorstrip, dataframe_to_itol_heatmap
 >>> import seaborn as sns
->>> 
+>>>
 >>> # Load data and run PICASSO analysis
 >>> cna_data = load_data()
 >>> picasso = Picasso(cna_data)
 >>> picasso.fit()
 >>> assignments = picasso.get_clone_assignments()
->>> 
+>>>
 >>> # Create color mapping for clones
 >>> unique_clones = assignments['clone_id'].unique()
 >>> colors = sns.color_palette('tab10', len(unique_clones))
 >>> color_map = dict(zip(unique_clones, colors))
->>> 
+>>>
 >>> # Generate iTOL colorstrip for clone assignments
->>> colorstrip = dataframe_to_itol_colorstrip(assignments['clone_id'], 
+>>> colorstrip = dataframe_to_itol_colorstrip(assignments['clone_id'],
 ...                                          color_map, 'Clone_Assignments')
 >>> with open('clone_colorstrip.txt', 'w') as f:
 ...     f.write(colorstrip)
->>> 
+>>>
 >>> # Generate iTOL heatmap for CNA profiles
 >>> heatmap = dataframe_to_itol_heatmap(cna_data, 'Copy_Number_Alterations')
 >>> with open('cna_heatmap.txt', 'w') as f:
@@ -71,10 +71,11 @@ import io
 import pandas as pd
 from typing import Dict, Tuple, Union
 
+
 def rgba_to_hex(rgba: Tuple[float, ...]) -> str:
     """
     Convert RGBA values to hexadecimal color string.
-    
+
     Parameters
     ----------
     rgba : tuple
@@ -105,24 +106,27 @@ def rgba_to_hex(rgba: Tuple[float, ...]) -> str:
     blue = min(1.0, max(0.0, blue))
 
     # Convert to hexadecimal and ensure two characters for each value
-    red_hex = format(int(red * 255), '02X')
-    green_hex = format(int(green * 255), '02X')
-    blue_hex = format(int(blue * 255), '02X')
+    red_hex = format(int(red * 255), "02X")
+    green_hex = format(int(green * 255), "02X")
+    blue_hex = format(int(blue * 255), "02X")
 
     # Concatenate the hexadecimal values
     hex_color = f"#{red_hex}{green_hex}{blue_hex}"
 
     return hex_color
 
-def dataframe_to_itol_colorstrip(series: pd.Series, 
-                                  cmap: Dict[str, Union[str, Tuple[float, ...]]], 
-                                  dataset_label: str) -> str:
+
+def dataframe_to_itol_colorstrip(
+    series: pd.Series,
+    cmap: Dict[str, Union[str, Tuple[float, ...]]],
+    dataset_label: str,
+) -> str:
     """
     Generate iTOL colorstrip annotation for phylogenetic tree visualization.
-    
-    Creates an iTOL-compatible colorstrip annotation file that can be used to 
+
+    Creates an iTOL-compatible colorstrip annotation file that can be used to
     visualize categorical data (such as clone assignments) alongside phylogenetic
-    trees. This is particularly useful for showing clone membership or other 
+    trees. This is particularly useful for showing clone membership or other
     discrete annotations in PICASSO results.
 
     Parameters
@@ -134,7 +138,7 @@ def dataframe_to_itol_colorstrip(series: pd.Series,
     cmap : dict
         Dictionary mapping categorical values to colors. Keys should be the unique
         values in the series, values can be either:
-        - Hex color strings (e.g., '#FF0000')  
+        - Hex color strings (e.g., '#FF0000')
         - RGB tuples (e.g., (1.0, 0.0, 0.0))
         - RGBA tuples (e.g., (1.0, 0.0, 0.0, 1.0))
         RGB/RGBA tuples will be automatically converted to hex format.
@@ -150,37 +154,37 @@ def dataframe_to_itol_colorstrip(series: pd.Series,
     Examples
     --------
     Create colorstrip for clone assignments:
-    
+
     >>> import pandas as pd
     >>> from picasso.itol_utils import dataframe_to_itol_colorstrip
-    >>> 
+    >>>
     >>> # Sample clone assignments
     >>> assignments = pd.Series(['Clone_A', 'Clone_A', 'Clone_B', 'Clone_C'],
     ...                        index=['Cell_1', 'Cell_2', 'Cell_3', 'Cell_4'])
-    >>> 
+    >>>
     >>> # Define color mapping
     >>> color_map = {
     ...     'Clone_A': '#FF0000',  # Red
-    ...     'Clone_B': '#00FF00',  # Green  
+    ...     'Clone_B': '#00FF00',  # Green
     ...     'Clone_C': '#0000FF'   # Blue
     ... }
-    >>> 
+    >>>
     >>> # Generate iTOL annotation
     >>> itol_content = dataframe_to_itol_colorstrip(assignments, color_map, 'Clone_Assignments')
-    >>> 
+    >>>
     >>> # Save to file for iTOL upload
     >>> with open('clone_colorstrip.txt', 'w') as f:
     ...     f.write(itol_content)
 
     Using RGB tuples (automatically converted):
-    
+
     >>> import seaborn as sns
-    >>> 
+    >>>
     >>> # Generate colors using seaborn
     >>> unique_clones = assignments.unique()
     >>> colors = sns.color_palette('tab10', len(unique_clones))
     >>> color_map = dict(zip(unique_clones, colors))
-    >>> 
+    >>>
     >>> # RGB tuples will be converted to hex automatically
     >>> itol_content = dataframe_to_itol_colorstrip(assignments, color_map, 'Clones')
 
@@ -190,15 +194,15 @@ def dataframe_to_itol_colorstrip(series: pd.Series,
     - Output format follows iTOL DATASET_COLORSTRIP specification
     - Files can be directly uploaded to iTOL web interface
     - Supports legends and custom labeling
-    
+
     **Color Handling**:
     - Automatically converts RGB/RGBA tuples to hex strings
     - Validates that all series values have corresponding colors in cmap
     - Supports any valid CSS/HTML color specification
-    
+
     **Use Cases**:
     - Visualizing PICASSO clone assignments on phylogenetic trees
-    - Showing cell type annotations alongside evolutionary relationships  
+    - Showing cell type annotations alongside evolutionary relationships
     - Displaying experimental conditions or metadata categories
     - Creating publication-ready annotated phylogenies
 
@@ -224,30 +228,32 @@ def dataframe_to_itol_colorstrip(series: pd.Series,
     # Create the annotations file and write it to buffer
 
     f = io.StringIO()
-    f.write('DATASET_COLORSTRIP\n')
-    f.write('SEPARATOR TAB\n')
-    f.write(f'DATASET_LABEL\t{dataset_label}\n')
-    f.write('COLOR\t#ff0000\n')
-    f.write(f'LEGEND_TITLE\t{dataset_label}\n')
-    f.write('LEGEND_SHAPES\t1\n')
-    f.write('LEGEND_COLORS\t#ff0000\n')
-    f.write(f'LEGEND_LABELS\t{dataset_label}\n')
-    f.write('DATA\n')
+    f.write("DATASET_COLORSTRIP\n")
+    f.write("SEPARATOR TAB\n")
+    f.write(f"DATASET_LABEL\t{dataset_label}\n")
+    f.write("COLOR\t#ff0000\n")
+    f.write(f"LEGEND_TITLE\t{dataset_label}\n")
+    f.write("LEGEND_SHAPES\t1\n")
+    f.write("LEGEND_COLORS\t#ff0000\n")
+    f.write(f"LEGEND_LABELS\t{dataset_label}\n")
+    f.write("DATA\n")
     for leaf in series.index:
         lineage = series.loc[leaf]
-        f.write(f'{leaf}\t{cmap[lineage]}\t{lineage}\n')
+        f.write(f"{leaf}\t{cmap[lineage]}\t{lineage}\n")
     text = f.getvalue()
     f.close()
     return text
 
 
-def dataframe_to_itol_heatmap(df: pd.DataFrame, 
-                               dataset_label: str = "CNVs", 
-                               color_min: str = '#3f4c8a', 
-                               color_max: str = '#b40426') -> str:
+def dataframe_to_itol_heatmap(
+    df: pd.DataFrame,
+    dataset_label: str = "CNVs",
+    color_min: str = "#3f4c8a",
+    color_max: str = "#b40426",
+) -> str:
     """
     Generate iTOL heatmap annotation for continuous data visualization.
-    
+
     Creates an iTOL-compatible heatmap annotation file for visualizing continuous
     numerical data (such as copy number alterations) alongside phylogenetic trees.
     Uses a three-color gradient to represent data range.
@@ -263,7 +269,7 @@ def dataframe_to_itol_heatmap(df: pd.DataFrame,
         Should be descriptive of the data type (e.g., "Copy_Number", "Expression").
     color_min : str, default='#3f4c8a'
         Hexadecimal color for minimum values in the heatmap. Default is dark blue.
-    color_max : str, default='#b40426'  
+    color_max : str, default='#b40426'
         Hexadecimal color for maximum values in the heatmap. Default is dark red.
 
     Returns
@@ -275,29 +281,29 @@ def dataframe_to_itol_heatmap(df: pd.DataFrame,
     Examples
     --------
     Create heatmap for CNA data:
-    
+
     >>> from picasso import load_data
     >>> from picasso.itol_utils import dataframe_to_itol_heatmap
-    >>> 
+    >>>
     >>> # Load CNA data
     >>> cna_data = load_data()
-    >>> 
+    >>>
     >>> # Generate iTOL heatmap annotation
-    >>> heatmap = dataframe_to_itol_heatmap(cna_data, 
+    >>> heatmap = dataframe_to_itol_heatmap(cna_data,
     ...                                    dataset_label='Copy_Number_Alterations',
     ...                                    color_min='#0000FF',  # Blue for deletions
     ...                                    color_max='#FF0000')  # Red for amplifications
-    >>> 
+    >>>
     >>> # Save for iTOL upload
     >>> with open('cna_heatmap.txt', 'w') as f:
     ...     f.write(heatmap)
 
     Custom color scheme:
-    
+
     >>> # Use custom colors
     >>> custom_heatmap = dataframe_to_itol_heatmap(
     ...     expression_data,
-    ...     dataset_label='Gene_Expression', 
+    ...     dataset_label='Gene_Expression',
     ...     color_min='#FFFFFF',  # White for low
     ...     color_max='#000000'   # Black for high
     ... )
@@ -309,18 +315,18 @@ def dataframe_to_itol_heatmap(df: pd.DataFrame,
     - Automatic scaling based on data range
     - Mid-color is fixed at light gray (#f5f5f5)
     - Supports negative and positive values
-    
+
     **Color Gradient**:
     - Values at minimum map to color_min
-    - Values at maximum map to color_max  
+    - Values at maximum map to color_max
     - Values at midpoint (typically 0) map to light gray
     - Linear interpolation for intermediate values
-    
+
     **Data Considerations**:
     - Works best with normalized/scaled data
     - Extreme outliers may compress visualization range
     - Consider data transformation for better visualization
-    
+
     **iTOL Integration**:
     - Upload tree (Newick format) and annotation file to iTOL
     - Customize appearance in iTOL interface
@@ -353,12 +359,13 @@ def dataframe_to_itol_heatmap(df: pd.DataFrame,
     file.close()
     return text
 
-def dataframe_to_itol_stackedbar(df: pd.DataFrame, 
-                                 cmap: Dict[str, Union[str, Tuple[float, ...]]], 
-                                 dataset_label: str) -> str:
+
+def dataframe_to_itol_stackedbar(
+    df: pd.DataFrame, cmap: Dict[str, Union[str, Tuple[float, ...]]], dataset_label: str
+) -> str:
     """
     Generate iTOL stacked bar annotation for multi-category data visualization.
-    
+
     Creates an iTOL-compatible multi-bar annotation file for visualizing multiple
     quantitative categories (such as clone proportions, cell type compositions,
     or feature counts) alongside phylogenetic trees as stacked bars.
@@ -388,37 +395,37 @@ def dataframe_to_itol_stackedbar(df: pd.DataFrame,
     Examples
     --------
     Visualize clone composition per sample:
-    
+
     >>> import pandas as pd
     >>> import seaborn as sns
     >>> from picasso.itol_utils import dataframe_to_itol_stackedbar
-    >>> 
+    >>>
     >>> # Create composition data (proportions sum to 1.0 per row)
     >>> composition_data = pd.DataFrame({
     ...     'Clone_A': [0.6, 0.8, 0.2, 0.1],
-    ...     'Clone_B': [0.3, 0.2, 0.5, 0.7], 
+    ...     'Clone_B': [0.3, 0.2, 0.5, 0.7],
     ...     'Clone_C': [0.1, 0.0, 0.3, 0.2]
     ... }, index=['Sample_1', 'Sample_2', 'Sample_3', 'Sample_4'])
-    >>> 
+    >>>
     >>> # Define colors for each clone
     >>> clone_colors = {
     ...     'Clone_A': '#FF0000',  # Red
     ...     'Clone_B': '#00FF00',  # Green
     ...     'Clone_C': '#0000FF'   # Blue
     ... }
-    >>> 
+    >>>
     >>> # Generate iTOL annotation
-    >>> stackedbar = dataframe_to_itol_stackedbar(composition_data, 
-    ...                                          clone_colors, 
+    >>> stackedbar = dataframe_to_itol_stackedbar(composition_data,
+    ...                                          clone_colors,
     ...                                          'Clone_Composition')
 
     Using RGB tuples with seaborn colors:
-    
+
     >>> # Generate colors automatically
     >>> categories = ['TypeA', 'TypeB', 'TypeC', 'TypeD']
     >>> colors = sns.color_palette('Set2', len(categories))
     >>> color_map = dict(zip(categories, colors))
-    >>> 
+    >>>
     >>> stackedbar = dataframe_to_itol_stackedbar(data, color_map, 'Cell_Types')
 
     Notes
@@ -428,22 +435,22 @@ def dataframe_to_itol_stackedbar(df: pd.DataFrame,
     - Segment heights proportional to values in DataFrame
     - Colors defined by the color mapping dictionary
     - Useful for showing compositional data
-    
+
     **Data Requirements**:
     - Non-negative values recommended for meaningful visualization
     - Values can be counts, proportions, or any quantitative measure
     - Missing values (NaN) treated as zero
     - Consider normalizing data for proportion-based visualization
-    
+
     **Color Handling**:
     - Supports hex strings, RGB, and RGBA color formats
     - Automatic conversion of tuple formats to hex strings
     - Colors must be defined for all DataFrame columns
     - Consistent color mapping across multiple annotations
-    
+
     **Use Cases**:
     - Clone composition per tissue/sample
-    - Cell type distributions per phylogenetic group  
+    - Cell type distributions per phylogenetic group
     - Multi-gene expression profiles
     - Pathway activity scores across conditions
 
@@ -455,7 +462,7 @@ def dataframe_to_itol_stackedbar(df: pd.DataFrame,
 
     See Also
     --------
-    dataframe_to_itol_colorstrip : Create categorical color annotations  
+    dataframe_to_itol_colorstrip : Create categorical color annotations
     dataframe_to_itol_heatmap : Create continuous data heatmaps
     rgba_to_hex : Convert color tuples to hex strings
     """
@@ -472,7 +479,9 @@ def dataframe_to_itol_stackedbar(df: pd.DataFrame,
     file.write(f"DATASET_LABEL\t{dataset_label}\n")
     file.write("FIELD_LABELS\t" + "\t".join(df.columns) + "\n")
     colors = "\t".join([cmap[col] for col in df.columns])
-    file.write(f"FIELD_COLORS\t{colors}\n")  # Default color, not used in coolwarm palette
+    file.write(
+        f"FIELD_COLORS\t{colors}\n"
+    )  # Default color, not used in coolwarm palette
 
     # Data section
     file.write("DATA\n")
@@ -486,11 +495,8 @@ def dataframe_to_itol_stackedbar(df: pd.DataFrame,
 
 # Define public API
 __all__ = [
-    'rgba_to_hex',
-    'dataframe_to_itol_colorstrip', 
-    'dataframe_to_itol_heatmap',
-    'dataframe_to_itol_stackedbar'
+    "rgba_to_hex",
+    "dataframe_to_itol_colorstrip",
+    "dataframe_to_itol_heatmap",
+    "dataframe_to_itol_stackedbar",
 ]
-
-
-

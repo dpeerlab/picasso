@@ -1,19 +1,19 @@
 """
 PICASSO: Phylogenetic Inference of Copy number Alterations in Single-cell Sequencing data Optimization.
 
-PICASSO is a computational method for reconstructing tumor phylogenies from noisy, 
-inferred copy number alteration (CNA) data derived from single-cell RNA sequencing 
-(scRNA-seq). Unlike methods designed for direct scDNA-seq data, PICASSO specifically 
-handles scalability and the uncertainty and noise inherent in CNA profiles inferred from gene 
+PICASSO is a computational method for reconstructing tumor phylogenies from noisy,
+inferred copy number alteration (CNA) data derived from single-cell RNA sequencing
+(scRNA-seq). Unlike methods designed for direct scDNA-seq data, PICASSO specifically
+handles scalability and the uncertainty and noise inherent in CNA profiles inferred from gene
 expression data.
 
 Key Features
 ------------
-- **Noise-aware phylogenetic inference**: Uses probabilistic models to handle 
+- **Noise-aware phylogenetic inference**: Uses probabilistic models to handle
   uncertainty in scRNA-seq-inferred CNAs
-- **Confidence-based termination**: Prevents over-fitting to noise through 
+- **Confidence-based termination**: Prevents over-fitting to noise through
   assignment confidence thresholds
-- **Flexible model selection**: Supports both BIC and confidence-based criteria 
+- **Flexible model selection**: Supports both BIC and confidence-based criteria
   for clone splitting decisions
 - **Comprehensive visualization**: Integrated plotting and iTOL export capabilities
 - **Scalable implementation**: Handles datasets with hundreds to thousands of cells
@@ -22,7 +22,7 @@ Main Components
 ---------------
 Picasso : class
     Core phylogenetic inference algorithm with categorical mixture modeling
-CloneTree : class  
+CloneTree : class
     Phylogenetic tree analysis and visualization framework
 utils : module
     Data preprocessing utilities including ternary encoding
@@ -33,21 +33,21 @@ Quick Start
 -----------
 >>> import pandas as pd
 >>> from picasso import Picasso, CloneTree, load_data
->>> 
+>>>
 >>> # Load example noisy CNA data
 >>> cna_data = load_data()
->>> 
+>>>
 >>> # Reconstruct phylogeny with noise-appropriate parameters
 >>> picasso = Picasso(cna_data,
 ...                  min_clone_size=10,  # Larger for noisy data
 ...                  assignment_confidence_threshold=0.8,
 ...                  terminate_by='probability')
 >>> picasso.fit()
->>> 
+>>>
 >>> # Extract results
 >>> phylogeny = picasso.get_phylogeny()
 >>> assignments = picasso.get_clone_assignments()
->>> 
+>>>
 >>> # Create integrated analysis object
 >>> clone_tree = CloneTree(phylogeny, assignments, cna_data)
 >>> clone_tree.plot_alterations(save_as='cna_heatmap.pdf')
@@ -106,18 +106,15 @@ __email__ = "sitara.persad@columbia.edu"
 # Define public API
 __all__ = [
     # Core classes
-    'Picasso',
-    'CloneTree',
-    
+    "Picasso",
+    "CloneTree",
     # Utility functions
-    'encode_cnvs_as_ternary',
-    'load_data',
-    
+    "encode_cnvs_as_ternary",
+    "load_data",
     # Submodules
-    'itol',
-    
+    "itol",
     # Package metadata
-    '__version__',
-    '__author__',
-    '__email__'
+    "__version__",
+    "__author__",
+    "__email__",
 ]
