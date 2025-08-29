@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/picasso-phylo.svg)](https://badge.fury.io/py/picasso-phylo)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/picasso_phylo.svg)](https://anaconda.org/conda-forge/picasso_phylo)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/github/license/dpeerlab/picasso)](LICENSE)
 
 PICASSO is a computational method for reconstructing tumor phylogenies from noisy, inferred copy number alteration (CNA) data derived from single-cell RNA sequencing (scRNA-seq). Unlike methods designed for direct scDNA-seq data, PICASSO specifically handles the uncertainty and noise inherent in CNA profiles inferred from gene expression data.
 
